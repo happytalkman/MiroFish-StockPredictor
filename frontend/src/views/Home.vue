@@ -1,38 +1,38 @@
 <template>
   <div class="home-container">
-    <!-- 顶部导航栏 -->
+    <!-- 상단 내비게이션 바 -->
     <nav class="navbar">
-      <div class="nav-brand">MIROFISH</div>
+      <div class="nav-brand">WEAIDSTOCK</div>
       <div class="nav-links">
         <router-link to="/stock" class="stock-nav-link">
           <span class="stock-nav-icon">📈</span> 주식 예측
         </router-link>
         <a href="https://github.com/666ghj/MiroFish" target="_blank" class="github-link">
-          访问我们的Github主页 <span class="arrow">↗</span>
+          GitHub 페이지 방문하기 <span class="arrow">↗</span>
         </a>
       </div>
     </nav>
 
     <div class="main-content">
-      <!-- 上半部分：Hero 区域 -->
+      <!-- 상단: Hero 영역 -->
       <section class="hero-section">
         <div class="hero-left">
           <div class="tag-row">
-            <span class="orange-tag">简洁通用的群体智能引擎</span>
-            <span class="version-text">/ v0.1-预览版</span>
+            <span class="orange-tag">간결한 범용 집단지성 엔진</span>
+            <span class="version-text">/ v0.1 프리뷰</span>
           </div>
           
           <h1 class="main-title">
-            上传任意报告<br>
-            <span class="gradient-text">即刻推演未来</span>
+            어떤 보고서든 업로드하고<br>
+            <span class="gradient-text">지금 바로 미래를 시뮬레이션하세요</span>
           </h1>
           
           <div class="hero-desc">
             <p>
-              即使只有一段文字，<span class="highlight-bold">MiroFish</span> 也能基于其中的现实种子，全自动生成与之对应的至多<span class="highlight-orange">百万级Agent</span>构成的平行世界。通过上帝视角注入变量，在复杂的群体交互中寻找动态环境下的<span class="highlight-code">“局部最优解”</span>
+              단 한 단락의 텍스트만 있어도 <span class="highlight-bold">WeAidStock</span>는 그 안의 현실 시드를 바탕으로 최대 <span class="highlight-orange">백만 단위 Agent</span>로 이루어진 평행 세계를 완전 자동으로 생성합니다. 전지적 시점에서 변수를 주입하고, 복잡한 집단 상호작용 속에서 동적 환경의 <span class="highlight-code">‘국소 최적해’</span>를 찾아냅니다.
             </p>
             <p class="slogan-text">
-              让未来在 Agent 群中预演，让决策在百战后胜出<span class="blinking-cursor">_</span>
+              미래는 Agent 군집 속에서 먼저 리허설하고, 결정은 수많은 시행 끝에 승리하도록<span class="blinking-cursor">_</span>
             </p>
           </div>
            
@@ -40,9 +40,9 @@
         </div>
         
         <div class="hero-right">
-          <!-- Logo 区域 -->
+          <!-- 로고 영역 -->
           <div class="logo-container">
-            <img src="../assets/logo/MiroFish_logo_left.jpeg" alt="MiroFish Logo" class="hero-logo" />
+            <img src="../assets/logo/WeAidStock_logo.svg" alt="WeAidStock 로고" class="hero-logo" />
           </div>
           
           <button class="scroll-down-btn" @click="scrollToBottom">
@@ -51,84 +51,84 @@
         </div>
       </section>
 
-      <!-- 下半部分：双栏布局 -->
+      <!-- 하단: 2단 레이아웃 -->
       <section class="dashboard-section">
-        <!-- 左栏：状态与步骤 -->
+        <!-- 왼쪽 열: 상태 및 단계 -->
         <div class="left-panel">
           <div class="panel-header">
-            <span class="status-dot">■</span> 系统状态
+            <span class="status-dot">■</span> 시스템 상태
           </div>
           
-          <h2 class="section-title">准备就绪</h2>
+          <h2 class="section-title">준비 완료</h2>
           <p class="section-desc">
-            预测引擎待命中，可上传多份非结构化数据以初始化模拟序列
+            예측 엔진 대기 중 · 여러 개의 비정형 데이터를 업로드해 시뮬레이션 시퀀스를 초기화할 수 있습니다
           </p>
           
-          <!-- 数据指标卡片 -->
+          <!-- 데이터 지표 카드 -->
           <div class="metrics-row">
             <div class="metric-card">
-              <div class="metric-value">低成本</div>
-              <div class="metric-label">常规模拟平均5$/次</div>
+              <div class="metric-value">저비용</div>
+              <div class="metric-label">일반 시뮬레이션 회당 평균 $5</div>
             </div>
             <div class="metric-card">
-              <div class="metric-value">高可用</div>
-              <div class="metric-label">最多百万级Agent模拟</div>
+              <div class="metric-value">고가용성</div>
+              <div class="metric-label">최대 백만 단위 Agent 시뮬레이션</div>
             </div>
           </div>
 
-          <!-- 项目模拟步骤介绍 (新增区域) -->
+          <!-- 프로젝트 시뮬레이션 단계 소개 (신규 영역) -->
           <div class="steps-container">
             <div class="steps-header">
-               <span class="diamond-icon">◇</span> 工作流序列
+               <span class="diamond-icon">◇</span> 워크플로 시퀀스
             </div>
             <div class="workflow-list">
               <div class="workflow-item">
                 <span class="step-num">01</span>
                 <div class="step-info">
-                  <div class="step-title">图谱构建</div>
-                  <div class="step-desc">现实种子提取 & 个体与群体记忆注入 & GraphRAG构建</div>
+                  <div class="step-title">그래프 구축</div>
+                  <div class="step-desc">현실 시드 추출 & 개인·집단 기억 주입 & GraphRAG 구축</div>
                 </div>
               </div>
               <div class="workflow-item">
                 <span class="step-num">02</span>
                 <div class="step-info">
-                  <div class="step-title">环境搭建</div>
-                  <div class="step-desc">实体关系抽取 & 人设生成 & 环境配置Agent注入仿真参数</div>
+                  <div class="step-title">환경 구성</div>
+                  <div class="step-desc">엔티티 관계 추출 & 페르소나 생성 & 환경 설정 Agent의 시뮬레이션 파라미터 주입</div>
                 </div>
               </div>
               <div class="workflow-item">
                 <span class="step-num">03</span>
                 <div class="step-info">
-                  <div class="step-title">开始模拟</div>
-                  <div class="step-desc">双平台并行模拟 & 自动解析预测需求 & 动态更新时序记忆</div>
+                  <div class="step-title">시뮬레이션 시작</div>
+                  <div class="step-desc">듀얼 플랫폼 병렬 시뮬레이션 & 예측 요구 자동 분석 & 시계열 기억 동적 업데이트</div>
                 </div>
               </div>
               <div class="workflow-item">
                 <span class="step-num">04</span>
                 <div class="step-info">
-                  <div class="step-title">报告生成</div>
-                  <div class="step-desc">ReportAgent拥有丰富的工具集与模拟后环境进行深度交互</div>
+                  <div class="step-title">보고서 생성</div>
+                  <div class="step-desc">ReportAgent가 풍부한 도구 세트로 시뮬레이션 이후 환경과 심층 상호작용</div>
                 </div>
               </div>
               <div class="workflow-item">
                 <span class="step-num">05</span>
                 <div class="step-info">
-                  <div class="step-title">深度互动</div>
-                  <div class="step-desc">与模拟世界中的任意一位进行对话 & 与ReportAgent进行对话</div>
+                  <div class="step-title">심층 인터랙션</div>
+                  <div class="step-desc">시뮬레이션 세계의 누구와도 대화 & ReportAgent와 대화</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 右栏：交互控制台 -->
+        <!-- 오른쪽 열: 인터랙션 콘솔 -->
         <div class="right-panel">
           <div class="console-box">
-            <!-- 上传区域 -->
+            <!-- 업로드 영역 -->
             <div class="console-section">
               <div class="console-header">
-                <span class="console-label">01 / 现实种子</span>
-                <span class="console-meta">支持格式: PDF, MD, TXT</span>
+                <span class="console-label">01 / 현실 시드</span>
+                <span class="console-meta">지원 형식: PDF, MD, TXT</span>
               </div>
               
               <div 
@@ -151,8 +151,8 @@
                 
                 <div v-if="files.length === 0" class="upload-placeholder">
                   <div class="upload-icon">↑</div>
-                  <div class="upload-title">拖拽文件上传</div>
-                  <div class="upload-hint">或点击浏览文件系统</div>
+                  <div class="upload-title">파일을 끌어다 놓아 업로드</div>
+                  <div class="upload-hint">또는 클릭하여 파일 찾아보기</div>
                 </div>
                 
                 <div v-else class="file-list">
@@ -165,37 +165,37 @@
               </div>
             </div>
 
-            <!-- 分割线 -->
+            <!-- 구분선 -->
             <div class="console-divider">
-              <span>输入参数</span>
+              <span>입력 파라미터</span>
             </div>
 
-            <!-- 输入区域 -->
+            <!-- 입력 영역 -->
             <div class="console-section">
               <div class="console-header">
-                <span class="console-label">>_ 02 / 模拟提示词</span>
+                <span class="console-label">>_ 02 / 시뮬레이션 프롬프트</span>
               </div>
               <div class="input-wrapper">
                 <textarea
                   v-model="formData.simulationRequirement"
                   class="code-input"
-                  placeholder="// 用自然语言输入模拟或预测需求（例.武大若发布撤销肖某处分的公告，会引发什么舆情走向）"
+                  placeholder="// 시뮬레이션 또는 예측 요청을 자연어로 입력하세요 (예: 삼성전자가 대규모 자사주 매입을 발표하면 시장 여론과 주가는 어떻게 움직일까?)"
                   rows="6"
                   :disabled="loading"
                 ></textarea>
-                <div class="model-badge">引擎: MiroFish-V1.0</div>
+                <div class="model-badge">엔진: WeAidStock-V1.0</div>
               </div>
             </div>
 
-            <!-- 启动按钮 -->
+            <!-- 시작 버튼 -->
             <div class="console-section btn-section">
               <button 
                 class="start-engine-btn"
                 @click="startSimulation"
                 :disabled="!canSubmit || loading"
               >
-                <span v-if="!loading">启动引擎</span>
-                <span v-else>初始化中...</span>
+                <span v-if="!loading">엔진 시작</span>
+                <span v-else>초기화 중...</span>
                 <span class="btn-arrow">→</span>
               </button>
             </div>
@@ -209,13 +209,13 @@
           <div class="stock-banner-icon">📈</div>
           <div class="stock-banner-text">
             <div class="stock-banner-title">NEW — AI 주식 예측 서비스</div>
-            <div class="stock-banner-desc">한국 주식 종목을 선택하고 MiroFish AI가 뉴스·재무·그래프 분석으로 예측 보고서를 자동 생성합니다.</div>
+            <div class="stock-banner-desc">한국 주식 종목을 선택하고 WeAidStock AI가 뉴스·재무·그래프 분석으로 예측 보고서를 자동 생성합니다.</div>
           </div>
           <router-link to="/stock" class="stock-banner-btn">지금 시작하기 →</router-link>
         </div>
       </section>
 
-      <!-- 历史项目数据库 -->
+      <!-- 과거 프로젝트 데이터베이스 -->
       <HistoryDatabase />
     </div>
   </div>
@@ -225,44 +225,45 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import HistoryDatabase from '../components/HistoryDatabase.vue'
+import { setPendingUpload } from '../store/pendingUpload'
 
 const router = useRouter()
 
-// 表单数据
+// 폼 데이터
 const formData = ref({
   simulationRequirement: ''
 })
 
-// 文件列表
+// 파일 목록
 const files = ref([])
 
-// 状态
+// 상태
 const loading = ref(false)
 const error = ref('')
 const isDragOver = ref(false)
 
-// 文件输入引用
+// 파일 입력 ref
 const fileInput = ref(null)
 
-// 计算属性:是否可以提交
+// 계산 속성: 제출 가능 여부
 const canSubmit = computed(() => {
   return formData.value.simulationRequirement.trim() !== '' && files.value.length > 0
 })
 
-// 触发文件选择
+// 파일 선택 트리거
 const triggerFileInput = () => {
   if (!loading.value) {
     fileInput.value?.click()
   }
 }
 
-// 处理文件选择
+// 파일 선택 처리
 const handleFileSelect = (event) => {
   const selectedFiles = Array.from(event.target.files)
   addFiles(selectedFiles)
 }
 
-// 处理拖拽相关
+// 드래그 앤 드롭 처리
 const handleDragOver = (e) => {
   if (!loading.value) {
     isDragOver.value = true
@@ -281,7 +282,7 @@ const handleDrop = (e) => {
   addFiles(droppedFiles)
 }
 
-// 添加文件
+// 파일 추가
 const addFiles = (newFiles) => {
   const validFiles = newFiles.filter(file => {
     const ext = file.name.split('.').pop().toLowerCase()
@@ -290,12 +291,12 @@ const addFiles = (newFiles) => {
   files.value.push(...validFiles)
 }
 
-// 移除文件
+// 파일 제거
 const removeFile = (index) => {
   files.value.splice(index, 1)
 }
 
-// 滚动到底部
+// 하단으로 스크롤
 const scrollToBottom = () => {
   window.scrollTo({
     top: document.body.scrollHeight,
@@ -303,25 +304,23 @@ const scrollToBottom = () => {
   })
 }
 
-// 开始模拟 - 立即跳转，API调用在Process页面进行
+// 시뮬레이션 시작 - 즉시 이동하며, API 호출은 Process 페이지에서 수행
 const startSimulation = () => {
   if (!canSubmit.value || loading.value) return
   
-  // 存储待上传的数据
-  import('../store/pendingUpload.js').then(({ setPendingUpload }) => {
-    setPendingUpload(files.value, formData.value.simulationRequirement)
-    
-    // 立即跳转到Process页面（使用特殊标识表示新建项目）
-    router.push({
-      name: 'Process',
-      params: { projectId: 'new' }
-    })
+  // 업로드 대기 데이터 저장
+  setPendingUpload(files.value, formData.value.simulationRequirement)
+
+  // Process 페이지로 즉시 이동 (특수 식별자로 신규 프로젝트임을 표시)
+  router.push({
+    name: 'Process',
+    params: { projectId: 'new' }
   })
 }
 </script>
 
 <style scoped>
-/* 全局变量与重置 */
+/* 전역 변수 및 초기화 */
 :root {
   --black: #000000;
   --white: #FFFFFF;
@@ -330,8 +329,8 @@ const startSimulation = () => {
   --gray-text: #666666;
   --border: #E5E5E5;
   /* 
-    使用 Space Grotesk 作为主要标题字体，JetBrains Mono 作为代码/标签字体
-    确保已在 index.html 引入这些 Google Fonts 
+    Space Grotesk를 주 제목 글꼴로, JetBrains Mono를 코드/라벨 글꼴로 사용
+    index.html에서 이 Google Fonts를 불러왔는지 확인할 것
   */
   --font-mono: 'JetBrains Mono', monospace;
   --font-sans: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
@@ -345,7 +344,7 @@ const startSimulation = () => {
   color: var(--black);
 }
 
-/* 顶部导航 */
+/* 상단 내비게이션 */
 .navbar {
   height: 60px;
   background: var(--black);
@@ -415,14 +414,14 @@ const startSimulation = () => {
   font-family: sans-serif;
 }
 
-/* 主要内容区 */
+/* 메인 콘텐츠 영역 */
 .main-content {
   max-width: 1400px;
   margin: 0 auto;
   padding: 60px 40px;
 }
 
-/* Hero 区域 */
+/* Hero 영역 */
 .hero-section {
   display: flex;
   justify-content: space-between;
@@ -553,7 +552,7 @@ const startSimulation = () => {
 }
 
 .hero-logo {
-  max-width: 500px; /* 调整logo大小 */
+  max-width: 500px; /* 로고 크기 조정 */
   width: 100%;
 }
 
@@ -575,7 +574,7 @@ const startSimulation = () => {
   border-color: var(--orange);
 }
 
-/* Dashboard 双栏布局 */
+/* Dashboard 2단 레이아웃 */
 .dashboard-section {
   display: flex;
   gap: 60px;
@@ -590,7 +589,7 @@ const startSimulation = () => {
   flex-direction: column;
 }
 
-/* 左侧面板 */
+/* 왼쪽 패널 */
 .left-panel {
   flex: 0.8;
 }
@@ -646,7 +645,7 @@ const startSimulation = () => {
   color: #999;
 }
 
-/* 项目模拟步骤介绍 */
+/* 프로젝트 시뮬레이션 단계 소개 */
 .steps-container {
   border: 1px solid var(--border);
   padding: 30px;
@@ -702,14 +701,14 @@ const startSimulation = () => {
   color: var(--gray-text);
 }
 
-/* 右侧交互控制台 */
+/* 오른쪽 인터랙션 콘솔 */
 .right-panel {
   flex: 1.2;
 }
 
 .console-box {
-  border: 1px solid #CCC; /* 外部实线 */
-  padding: 8px; /* 内边距形成双重边框感 */
+  border: 1px solid #CCC; /* 바깥 실선 */
+  padding: 8px; /* 안쪽 여백으로 이중 테두리 효과 */
 }
 
 .console-section {
@@ -877,7 +876,7 @@ const startSimulation = () => {
   overflow: hidden;
 }
 
-/* 可点击状态（非禁用） */
+/* 클릭 가능 상태 (비활성 아님) */
 .start-engine-btn:not(:disabled) {
   background: var(--black);
   border: 1px solid var(--black);
@@ -902,7 +901,7 @@ const startSimulation = () => {
   border: 1px solid #E5E5E5;
 }
 
-/* 引导动画：微妙的边框脉冲 */
+/* 유도 애니메이션: 은은한 테두리 펄스 */
 @keyframes pulse-border {
   0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2); }
   70% { box-shadow: 0 0 0 6px rgba(0, 0, 0, 0); }
@@ -968,7 +967,7 @@ const startSimulation = () => {
   transform: translateX(3px);
 }
 
-/* 响应式适配 */
+/* 반응형 대응 */
 @media (max-width: 1024px) {
   .dashboard-section {
     flex-direction: column;
