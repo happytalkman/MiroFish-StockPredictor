@@ -38,14 +38,8 @@
     <main class="wrap">
       <div class="intro">
         <div>
-          <h1>설정</h1>
-          <p class="muted">API 키와 데이터 소스를 이 화면에서 관리합니다. 값은 이 PC 의 <code>.env</code> 에만 저장되고(<span class="mono small">{{ envPath || '…' }}</span>), 다른 기기에서는 이 화면이 열리지 않습니다. 키는 앞·뒤 4자리만 표시됩니다.</p>
-        </div>
-        <div class="intro-actions">
-          <button class="btn" :disabled="restart.state === 'running'" @click="doRestart">
-            <svg viewBox="0 0 24 24" width="14" height="14" :class="{ spin: restart.state === 'running' }" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" /></svg>
-            {{ restart.state === 'running' ? '재시작 중…' : '백엔드 재시작' }}
-          </button>
+          <h1>서비스 설정</h1>
+          <p class="muted">복잡한 값은 숨기고, 지금 필요한 작업만 안내합니다. 비밀 값은 이 PC에만 안전하게 저장됩니다.</p>
         </div>
       </div>
 
@@ -57,58 +51,96 @@
       <div v-if="restart.state === 'fail'" class="banner err">{{ restart.error }}</div>
       <div v-if="loadError" class="banner err">{{ loadError }} <button class="btn sm" @click="load">다시 시도</button></div>
 
+      <section class="setup-card" :class="{ ready: allReady }">
+        <div class="setup-copy">
+          <span class="eyebrow">{{ allReady ? '모든 기능 준비 완료' : '설정 도우미' }}</span>
+          <h2>{{ setupTitle }}</h2>
+          <p>{{ setupDescription }}</p>
+          <button v-if="!coreReady" class="btn primary setup-action" @click="openCoreSettings">AI 분석 연결하기</button>
+          <button v-else-if="!remoteReady" class="btn primary setup-action" @click="openRemoteSettings">원격 접속 연결하기</button>
+          <a v-else class="btn primary setup-action" href="/" @click.prevent="router.push('/')">대시보드로 이동</a>
+        </div>
+        <div class="readiness" aria-label="서비스 준비 상태">
+          <button class="ready-item" @click="openCoreSettings">
+            <span class="ready-icon" :class="{ on: coreReady }">{{ coreReady ? '✓' : '1' }}</span>
+            <span><b>AI 분석</b><small>{{ coreReady ? '연결됨' : '연결 필요' }}</small></span>
+          </button>
+          <button class="ready-item" @click="openRemoteSettings">
+            <span class="ready-icon" :class="{ on: remoteReady }">{{ remoteReady ? '✓' : '2' }}</span>
+            <span><b>원격 접속</b><small>{{ remoteReady ? '정상' : '선택 사항' }}</small></span>
+          </button>
+          <span class="ready-item static">
+            <span class="ready-icon" :class="{ on: !!status }">{{ status ? '✓' : '3' }}</span>
+            <span><b>로컬 서비스</b><small>{{ status ? '정상 작동' : '확인 중' }}</small></span>
+          </span>
+        </div>
+      </section>
+
       <div class="grid">
         <!-- 설정 그룹 -->
         <section class="col-main">
-          <div v-for="g in groupOrder" :key="g" v-show="byGroup[g]?.length" class="card">
-            <div class="card-head">
-              <h2>{{ groups[g] || g }}</h2>
-              <span class="muted small">{{ byGroup[g]?.filter(i => i.set).length || 0 }}/{{ byGroup[g]?.length || 0 }} 설정됨</span>
-            </div>
-            <div v-for="it in byGroup[g]" :key="it.key" class="row" :class="{ dirty: isDirty(it.key) }">
-              <div class="row-label">
-                <div class="lbl">
-                  {{ it.label }}
-                  <span v-if="it.restart" class="tag" title="바꾸면 재시작해야 적용됩니다">재시작</span>
+          <details ref="coreSettings" class="section-panel" :open="!coreReady">
+            <summary>
+              <span><b>연결 및 기능 설정</b><small>AI 공급자, 데이터 소스, 알림과 자동 실행</small></span>
+              <span class="summary-state">{{ configuredCount }}/{{ items.length }} 설정</span>
+            </summary>
+            <div class="section-body">
+              <div v-for="g in groupOrder" :key="g" v-show="byGroup[g]?.length" class="card" :data-group="g">
+                <div class="card-head">
+                  <h2>{{ groups[g] || g }}</h2>
+                  <span class="muted small">{{ byGroup[g]?.filter(i => i.set).length || 0 }}/{{ byGroup[g]?.length || 0 }} 설정됨</span>
                 </div>
-                <div class="key mono">{{ it.key }}</div>
-                <div class="help" v-if="it.help">{{ it.help }}</div>
-              </div>
-              <div class="row-ctl">
-                <div class="cur">
-                  <span v-if="clears.has(it.key)" class="state del">삭제 예정</span>
-                  <span v-else-if="it.set" class="state on">
-                    <i></i>{{ it.secret ? '설정됨' : '현재' }} <span class="mono">{{ it.display }}</span>
-                  </span>
-                  <span v-else class="state off">미설정</span>
-                  <span v-if="it.pending_restart" class="state pend">재시작 대기</span>
-                </div>
-                <div class="inputs">
-                  <select v-if="it.options" v-model="drafts[it.key]" :aria-label="it.label">
-                    <option value="">— 변경 없음 —</option>
-                    <option v-for="o in it.options" :key="o" :value="o">{{ o }}</option>
-                  </select>
-                  <div v-else class="pw">
-                    <input :type="it.secret && !reveal[it.key] ? 'password' : 'text'" v-model="drafts[it.key]"
-                      :placeholder="it.set ? '새 값을 입력하면 교체' : (it.placeholder || '')" autocomplete="off" spellcheck="false"
-                      :aria-label="it.label" />
-                    <button v-if="it.secret" class="eye" type="button" :title="reveal[it.key] ? '숨기기' : '보기'" @click="reveal[it.key] = !reveal[it.key]">
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                    </button>
+                <div v-for="it in byGroup[g]" :key="it.key" class="row" :class="{ dirty: isDirty(it.key) }">
+                  <div class="row-label">
+                    <div class="lbl">
+                      {{ it.label }}
+                      <span v-if="it.restart" class="tag" title="바꾸면 재시작해야 적용됩니다">재시작</span>
+                    </div>
+                    <div class="key mono">{{ it.key }}</div>
+                    <div class="help" v-if="it.help">{{ it.help }}</div>
                   </div>
-                  <button v-if="it.test" class="btn sm" :disabled="testing[it.key]" @click="runTest(it)">{{ testing[it.key] ? '확인 중…' : '연결 테스트' }}</button>
-                  <button v-if="it.set && !clears.has(it.key)" class="btn sm ghost" title="값 삭제" @click="toggleClear(it.key)">삭제</button>
-                  <button v-else-if="clears.has(it.key)" class="btn sm ghost" @click="toggleClear(it.key)">취소</button>
-                </div>
-                <div v-if="tests[it.key]" class="test" :class="tests[it.key].ok ? 'ok' : 'err'">
-                  {{ tests[it.key].ok ? '✓' : '✕' }} {{ tests[it.key].message }} <span class="muted">· {{ tests[it.key].ms }}ms</span>
+                  <div class="row-ctl">
+                    <div class="cur">
+                      <span v-if="clears.has(it.key)" class="state del">삭제 예정</span>
+                      <span v-else-if="it.set" class="state on">
+                        <i></i>{{ it.secret ? '설정됨' : '현재' }} <span class="mono">{{ it.display }}</span>
+                      </span>
+                      <span v-else class="state off">미설정</span>
+                      <span v-if="it.pending_restart" class="state pend">재시작 대기</span>
+                    </div>
+                    <div class="inputs">
+                      <select v-if="it.options" v-model="drafts[it.key]" :aria-label="it.label">
+                        <option value="">— 변경 없음 —</option>
+                        <option v-for="o in it.options" :key="o" :value="o">{{ o }}</option>
+                      </select>
+                      <div v-else class="pw">
+                        <input :type="it.secret && !reveal[it.key] ? 'password' : 'text'" v-model="drafts[it.key]"
+                          :placeholder="it.set ? '새 값을 입력하면 교체' : (it.placeholder || '')" autocomplete="off" spellcheck="false"
+                          :aria-label="it.label" />
+                        <button v-if="it.secret" class="eye" type="button" :title="reveal[it.key] ? '숨기기' : '보기'" @click="reveal[it.key] = !reveal[it.key]">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                        </button>
+                      </div>
+                      <button v-if="it.test" class="btn sm" :disabled="testing[it.key]" @click="runTest(it)">{{ testing[it.key] ? '확인 중…' : '연결 테스트' }}</button>
+                      <button v-if="it.set && !clears.has(it.key)" class="btn sm ghost" title="값 삭제" @click="toggleClear(it.key)">삭제</button>
+                      <button v-else-if="clears.has(it.key)" class="btn sm ghost" @click="toggleClear(it.key)">취소</button>
+                    </div>
+                    <div v-if="tests[it.key]" class="test" :class="tests[it.key].ok ? 'ok' : 'err'">
+                      {{ tests[it.key].ok ? '✓' : '✕' }} {{ tests[it.key].message }} <span class="muted">· {{ tests[it.key].ms }}ms</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </details>
 
           <!-- 운영 지표 -->
-          <div class="card ops">
+          <details class="section-panel">
+            <summary>
+              <span><b>운영 현황과 진단</b><small>사용량, 예상 비용, 처리 시간과 자체 점검</small></span>
+              <span class="summary-state">고급</span>
+            </summary>
+            <div class="section-body"><div class="card ops">
             <div class="card-head">
               <h2>운영 지표 <span class="muted small">LLM 사용량·추정 비용·단계별 소요 시간</span></h2>
               <button class="btn sm" :disabled="selftest?.state === 'running'" @click="runSelftest">{{ selftest?.state === 'running' ? '점검 중…' : '자체 점검' }}</button>
@@ -187,6 +219,8 @@
               </details>
             </template>
           </div>
+            </div>
+          </details>
         </section>
 
         <!-- 시스템 -->
@@ -225,7 +259,7 @@
             <div v-else class="muted small">불러오는 중…</div>
             <p v-if="rs?.tunnel?.last_error && !rs?.tunnel?.running" class="rerr small">{{ rs.tunnel.last_error }}</p>
             <details class="how">
-              <summary>터널 토큰은 어디서 받나요?</summary>
+              <summary>직접 연결해야 할 때만 보기</summary>
               <ol>
                 <li><a href="https://one.dash.cloudflare.com/" target="_blank" rel="noopener">Cloudflare Zero Trust 대시보드</a> → Networks → Tunnels → <b>weaidstock</b> → 구성(Configure)</li>
                 <li>커넥터 설치 화면에서 Windows 를 고르고 명령어를 복사</li>
@@ -236,6 +270,11 @@
             </details>
           </div>
 
+          <details class="section-panel side-tools">
+            <summary>
+              <span><b>고급 관리 도구</b><small>시스템 정보, 구성요소 설치와 로그</small></span>
+            </summary>
+            <div class="section-body">
           <div class="card">
             <div class="card-head"><h2>시스템</h2><button class="btn sm ghost" @click="loadStatus">새로고침</button></div>
             <dl class="kv" v-if="status">
@@ -302,6 +341,8 @@
             </div>
             <label class="auto"><input type="checkbox" v-model="logAuto" /> 5초마다 자동 갱신</label>
           </div>
+            </div>
+          </details>
         </aside>
       </div>
     </main>
@@ -357,6 +398,7 @@ const logLevel = ref('')
 const logAuto = ref(false)
 const logEl = ref(null)
 const installing = ref(false)
+const coreSettings = ref(null)
 let logTimer = null
 let toastTimer = null
 
@@ -371,6 +413,32 @@ const byGroup = computed(() => {
 const isDirty = (k) => (drafts[k] || '').trim() !== '' || clears.has(k)
 const dirtyKeys = computed(() => items.value.map(i => i.key).filter(isDirty))
 const dirtyCount = computed(() => dirtyKeys.value.length)
+const configuredCount = computed(() => items.value.filter(i => i.set).length)
+const itemSet = (key) => !!items.value.find(i => i.key === key)?.set
+const coreReady = computed(() => {
+  const provider = items.value.find(i => i.key === 'LLM_PROVIDER')?.display || 'xai'
+  return provider === 'custom' ? itemSet('LLM_API_KEY') : itemSet('XAI_API_KEY')
+})
+const remoteReady = computed(() => !!rs.value?.tunnel?.running && rs.value?.tunnel?.public?.ok !== false)
+const allReady = computed(() => coreReady.value && remoteReady.value && !!status.value)
+const setupTitle = computed(() => {
+  if (!coreReady.value) return 'AI 분석 연결이 필요합니다'
+  if (!remoteReady.value) return 'AI 분석은 준비됐습니다'
+  return '서비스가 정상 작동 중입니다'
+})
+const setupDescription = computed(() => {
+  if (!coreReady.value) return '분석에 사용할 AI 공급자만 연결하면 나머지는 권장값으로 바로 시작할 수 있습니다.'
+  if (!remoteReady.value) return '이 PC에서는 바로 사용할 수 있습니다. 외부 접속은 필요할 때 한 번만 연결하세요.'
+  return 'AI 분석과 원격 접속이 모두 준비됐습니다. 별도 작업 없이 계속 사용할 수 있습니다.'
+})
+
+async function openSettingsGroup(group) {
+  if (coreSettings.value) coreSettings.value.open = true
+  await nextTick()
+  document.querySelector(`[data-group="${group}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+const openCoreSettings = () => openSettingsGroup('llm')
+const openRemoteSettings = () => openSettingsGroup('remote')
 
 function flash(text, kind = 'ok') {
   toast.value = { text, kind }
@@ -724,6 +792,44 @@ code { font-family: var(--mono); font-size: 12px; background: var(--subtle); pad
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
 .card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .card-head h2 { font-size: 13.5px; font-weight: 700; letter-spacing: -.01em; }
+.setup-card {
+  display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(360px, .8fr); gap: 28px; align-items: center;
+  margin-bottom: 16px; padding: 24px; border: 1px solid rgba(59, 130, 246, .35); border-radius: 14px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, .14), rgba(16, 185, 129, .06));
+}
+.setup-card.ready { border-color: rgba(16, 185, 129, .35); }
+.eyebrow { display: block; margin-bottom: 7px; color: #60a5fa; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.setup-card.ready .eyebrow { color: #34d399; }
+.setup-copy h2 { margin: 0 0 7px; font-size: 21px; }
+.setup-copy p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.setup-action { margin-top: 16px; text-decoration: none; }
+.readiness { display: grid; gap: 7px; }
+.ready-item {
+  display: flex; align-items: center; gap: 11px; width: 100%; padding: 10px; border: 1px solid var(--subtle);
+  border-radius: 9px; background: rgba(8, 11, 16, .42); color: var(--text); text-align: left;
+}
+button.ready-item:hover { border-color: var(--border); background: rgba(30, 41, 59, .65); }
+.ready-item.static { cursor: default; }
+.ready-item > span:last-child { display: flex; flex: 1; align-items: center; justify-content: space-between; gap: 8px; }
+.ready-item b { font-size: 12.5px; }
+.ready-item small { color: var(--muted); }
+.ready-icon { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: rgba(245, 158, 11, .13); color: #fbbf24; font-size: 11px; font-weight: 700; }
+.ready-icon.on { background: rgba(16, 185, 129, .14); color: #34d399; }
+.section-panel { border: 1px solid var(--border); border-radius: 10px; background: var(--panel); overflow: hidden; }
+.section-panel > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 16px; cursor: pointer;
+  list-style: none; user-select: none;
+}
+.section-panel > summary::-webkit-details-marker { display: none; }
+.section-panel > summary::after { content: '⌄'; color: var(--muted); font-size: 18px; transition: transform .2s; }
+.section-panel[open] > summary::after { transform: rotate(180deg); }
+.section-panel > summary > span:first-child { display: flex; flex-direction: column; gap: 3px; }
+.section-panel > summary b { font-size: 13.5px; }
+.section-panel > summary small, .summary-state { color: var(--muted); font-size: 11.5px; }
+.summary-state { margin-left: auto; }
+.section-body { display: flex; flex-direction: column; gap: 12px; padding: 0 12px 12px; border-top: 1px solid var(--subtle); }
+.section-body > .card { border-color: var(--subtle); }
+.side-tools .section-body { padding-top: 12px; }
 /* 원격 접속 */
 .remote .pub { display: inline-block; margin-bottom: 10px; color: #60a5fa; text-decoration: none; font-size: 13px; }
 .remote .pub:hover { text-decoration: underline; }
@@ -810,6 +916,7 @@ select { flex: 1 1 240px; padding-right: 10px; font-family: var(--sans); }
 .toast.bar-enter-from, .toast.bar-leave-to { transform: translateY(-6px); }
 
 @media (max-width: 1080px) {
+  .setup-card { grid-template-columns: minmax(0, 1fr); }
   .grid { grid-template-columns: minmax(0, 1fr); }
   .col-side { position: static; }
 }
@@ -818,6 +925,8 @@ select { flex: 1 1 240px; padding-right: 10px; font-family: var(--sans); }
   .tb-left { gap: 12px; flex-wrap: wrap; }
   .wrap { padding: 16px; }
   .intro { flex-direction: column; }
+  .setup-card { padding: 18px; gap: 18px; }
+  .ready-item > span:last-child { align-items: flex-start; flex-direction: column; gap: 2px; }
   .row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .savebar { left: 16px; right: 16px; transform: none; gap: 10px; }
   .bar-enter-from, .bar-leave-to { transform: translateY(10px); }
