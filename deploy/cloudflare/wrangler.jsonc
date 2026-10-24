@@ -1,0 +1,39 @@
+// WeAidStock → Cloudflare Containers (Workers Paid 필요)
+// 배포:  cd deploy/cloudflare && npm install && npx wrangler deploy
+// 비밀값: npx wrangler secret put XAI_API_KEY  (필요한 것만 — docs/cloud-migration.md 의 표 참고)
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "weaidstock",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-22",
+
+  // 전환(컷오버) 때만 주석을 풉니다 — 먼저 stock.webig.ai 의 터널 CNAME 을 지워야 합니다.
+  // 기존 Cloudflare Access 앱(WeAidStock)은 호스트 이름 기준이라 그대로 이 Worker 앞에서 동작합니다.
+  // "routes": [{ "pattern": "stock.webig.ai", "custom_domain": true }],
+  "workers_dev": false,
+
+  "containers": [
+    {
+      "class_name": "WeAidStock",
+      "image": "../../Dockerfile",
+      "image_build_context": "../..",
+      "max_instances": 1,                       // 스케줄러·작업 상태가 한 프로세스를 전제로 함 — 늘리지 마세요
+      "instance_type": "standard-1",            // 1/2 vCPU · 4 GiB · 8 GB (보고서 병렬 LLM 호출·온톨로지에 충분)
+      "constraints": { "regions": ["APAC"] }    // 네이버·KRX 데이터 소스와 가깝게
+    }
+  ],
+  "durable_objects": { "bindings": [{ "class_name": "WeAidStock", "name": "WEAID" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["WeAidStock"] }],
+
+  // 5분마다 — 평일 07:30~17:00 KST 에만 컨테이너를 깨워 둠 (안의 스케줄러가 테마·알림·채점을 처리)
+  "triggers": { "crons": ["*/5 * * * *"] },
+
+  "vars": {
+    "REPORT_SPEED": "balanced",
+    "REMOTE_ACCESS": "access",
+    "WATCHLIST_SCHEDULE": "off",
+    "SNAPSHOT_EVERY": "900",
+    "R2_PREFIX": "weaidstock"
+  },
+  "observability": { "enabled": true }
+}

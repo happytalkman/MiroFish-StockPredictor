@@ -58,3 +58,22 @@ backend/uploads/
 
 # Docker 数据
 data/
+# ── WeAidStock ──
+# 키·비밀값이 들어 있는 파일은 절대 커밋하지 않음
+.env.bak
+.env.tmp
+*.bak
+*api key*.txt
+*apikey*.txt
+*secret*.txt
+# 실행 중 생성되는 파일
+restart.log
+backend/server.*.log
+frontend/server.*.log
+frontend/dist/
+backend/.pytest_cache/
+# 원격 접속(stock.webig.ai)
+backend/.flask_secret
+backend/bin/
+frontend/dist_build/
+frontend/dist_old/
